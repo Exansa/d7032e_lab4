@@ -1,16 +1,92 @@
 <?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>PaymentTest.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">CodeCoverageReport</a> &gt; <a href="index.source.html" class="el_package">ltu</a> &gt; <span class="el_source">PaymentTest.java</span></div><h1>PaymentTest.java</h1><pre class="source lang-java linenums">package ltu;
 
+import static ltu.CalendarFactory.getCalendar;
 import static org.junit.Assert.*;
+import java.io.IOException;
 
 import org.junit.Test;
+import java.util.Calendar;
+import ltu.PaymentImpl;
 
-<span class="fc" id="L7">public class PaymentTest</span>
+//public class PaymentTest
+//{
+//    @Test
+//    public void getMonthlyAmount()
+//    {
+//        assertEquals(9094, );
+//    }
+//
+//}
+<span class="fc" id="L20">public class PaymentTest</span>
 {
-    @Test
-    public void testSilly()
-    {
-<span class="fc" id="L12">        assertEquals(1, 1);</span>
-<span class="fc" id="L13">    }</span>
 
+<span class="fc" id="L23">    private int FULL = 9904;</span>
+<span class="fc" id="L24">    private int HALF = 4960;</span>
+<span class="fc" id="L25">    private int ZERO = 0;</span>
+<span class="fc" id="L26">    private int FULL_SUBSIDY = 2816;</span>
+<span class="fc" id="L27">    private int HALF_SUBSIDY = 1396;</span>
+<span class="fc" id="L28">    private int FULL_LOAN = 7088;</span>
+<span class="fc" id="L29">    private int HALF_LOAN = 3564;</span>
+
+    @Test
+    public void testDay() throws IOException {
+<span class="fc" id="L33">        PaymentImpl p = new PaymentImpl(getCalendar());</span>
+
+<span class="fc" id="L35">        assertEquals(&quot;20160129&quot;, p.getNextPaymentDay());</span>
+<span class="fc" id="L36">    }</span>
+
+    @Test
+    public void testAge() throws IOException{
+<span class="fc" id="L40">        PaymentImpl p = new PaymentImpl(getCalendar());</span>
+
+<span class="fc" id="L42">        assertEquals(ZERO, p.getMonthlyAmount(&quot;19970201-8138&quot;,0,100,100));//19year</span>
+
+<span class="fc" id="L44">        assertEquals(FULL, p.getMonthlyAmount(&quot;19960201-8138&quot;,0,100,100));//20 years</span>
+<span class="fc" id="L45">        assertEquals(FULL, p.getMonthlyAmount(&quot;19950201-8138&quot;,0,100,100));//21 years</span>
+
+<span class="fc" id="L47">        assertEquals(FULL_SUBSIDY, p.getMonthlyAmount(&quot;19600201-8138&quot;,0,100,100));//56 years</span>
+<span class="fc" id="L48">        assertEquals(ZERO, p.getMonthlyAmount(&quot;19590201-8138&quot;,0,100,100));//57 years</span>
+
+<span class="fc" id="L50">        assertEquals(FULL_SUBSIDY, p.getMonthlyAmount(&quot;19690801-8138&quot;,0,100,100));//47 years</span>
+<span class="fc" id="L51">        assertEquals(FULL_SUBSIDY, p.getMonthlyAmount(&quot;19680801-8138&quot;,0,100,100));//48 years</span>
+<span class="fc" id="L52">    }</span>
+
+    @Test
+    public void testStudyPace() throws IOException{
+<span class="fc" id="L56">        PaymentImpl p = new PaymentImpl(getCalendar());</span>
+
+<span class="fc" id="L58">        assertEquals(FULL, p.getMonthlyAmount(&quot;19950201-8138&quot;,0,100,100));//100% study pace</span>
+<span class="fc" id="L59">        assertEquals(HALF, p.getMonthlyAmount(&quot;19950201-8138&quot;,0,99,100));//99% study pace</span>
+<span class="fc" id="L60">        assertEquals(HALF, p.getMonthlyAmount(&quot;19950201-8138&quot;,0,50,100));//50% study pace</span>
+<span class="fc" id="L61">        assertEquals(ZERO, p.getMonthlyAmount(&quot;19950201-8138&quot;,0,49,100));//49% study pace</span>
+<span class="fc" id="L62">    }</span>
+
+    @Test
+    public void testStudyCompletion() throws IOException{
+<span class="fc" id="L66">        PaymentImpl p = new PaymentImpl(getCalendar());</span>
+
+<span class="fc" id="L68">        assertEquals(FULL, p.getMonthlyAmount(&quot;19950201-8138&quot;,0,100,100));//100% completion</span>
+<span class="fc" id="L69">        assertEquals(FULL, p.getMonthlyAmount(&quot;19950201-8138&quot;,0,100,99));//99% Completion</span>
+<span class="fc" id="L70">        assertEquals(FULL, p.getMonthlyAmount(&quot;19950201-8138&quot;,0,100,50));//50% completion</span>
+<span class="fc" id="L71">        assertEquals(ZERO, p.getMonthlyAmount(&quot;19950201-8138&quot;,0,100,49));//49% completiion</span>
+<span class="fc" id="L72">    }</span>
+
+    @Test
+    public void testIncome() throws IOException{
+<span class="fc" id="L76">        PaymentImpl p = new PaymentImpl(getCalendar());</span>
+
+<span class="fc" id="L78">        assertEquals(FULL, p.getMonthlyAmount(&quot;19950201-8138&quot;,85812,100,100));//100% under limit </span>
+<span class="fc" id="L79">        assertEquals(FULL, p.getMonthlyAmount(&quot;19950201-8138&quot;,85813,100,100));//100% at limit </span>
+<span class="fc" id="L80">        assertEquals(ZERO, p.getMonthlyAmount(&quot;19950201-8138&quot;,85814,100,100));//100% over limit</span>
+        //assertEquals(HALF, p.getMonthlyAmount(&quot;19950201-8138&quot;,128721,50,100));//50% under limit
+        //assertEquals(HALF, p.getMonthlyAmount(&quot;19950201-8138&quot;,128722,50,100));//50% at limit
+<span class="fc" id="L83">        assertEquals(ZERO, p.getMonthlyAmount(&quot;19950201-8138&quot;,128723,50,100));//50% over limit</span>
+<span class="fc" id="L84">    }</span>
+
+    public void testEx() throws IOException{
+<span class="nc" id="L87">        PaymentImpl p = new PaymentImpl(getCalendar());</span>
+        
+<span class="nc" id="L89">        assertEquals(&quot;Invalid input.&quot;, p.getMonthlyAmount(&quot;19950201-81381&quot;,85812,100,100));</span>
+<span class="nc" id="L90">    }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>
